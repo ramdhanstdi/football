@@ -3,12 +3,38 @@ import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
 import FormLogin from '../components/FormLogin';
 import {TEXT_DARK} from 'assets/const/FontColor';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import http from 'helpers/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
-  const onSubmit = (val: any) => {
-    console.log(val);
+
+  const setItemToken = async (token: string, username: string) => {
+    try {
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('username', username);
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
+  const onSubmit = async (val: any) => {
+    const objectValue = {
+      username: val.Email,
+      password: val.Password,
+      device: 'MOBILE',
+    };
+    try {
+      const fetch = await http();
+      const response = await fetch.post('/auth/login', {
+        ...objectValue,
+      });
+      setItemToken(response.data.token, response.data.user.username);
+      navigation.navigate('BottomTabComponent');
+    } catch (error) {
+      //
+    }
   };
   const handleChange = (field: string, value: any) => {
     setFieldForm(prevState => ({

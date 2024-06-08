@@ -1,33 +1,59 @@
 import {View, ScrollView, Image, Text} from 'react-native';
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import CardSlideHorizontal from '../components/CardSlideHorizontal';
 import Button from 'base/components/Button';
 import {PRIMARY_COLOR, TEXT_DARK, TEXT_LIGHT} from 'assets/const/FontColor';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import http from 'helpers/axios';
 
 const Home = ({navigation}: any) => {
-  const dataArray = [
-    {
-      title: 'Orang Lucu',
-      imgSrc:
-        'https://cdn.britannica.com/69/228369-050-0B18A1F6/Asian-Cup-Final-2019-Hasan-Al-Haydos-Qatar-Japan-Takumi-Minamino.jpg',
-      href: '',
-    },
-    {
-      title: 'Orang Pintar',
-      imgSrc:
-        'https://cdn.britannica.com/69/228369-050-0B18A1F6/Asian-Cup-Final-2019-Hasan-Al-Haydos-Qatar-Japan-Takumi-Minamino.jpg',
-      href: '',
-    },
-    {
-      title: 'Orang Cerdas',
-      imgSrc:
-        'https://cdn.britannica.com/69/228369-050-0B18A1F6/Asian-Cup-Final-2019-Hasan-Al-Haydos-Qatar-Japan-Takumi-Minamino.jpg',
-      href: '',
-    },
-  ];
+  const [user, setUser] = useState('');
+  const [dataNews, setDataNews] = useState([{title: '', linkUrl: '', id: ''}]);
+  const [detailUser, setDetail] = useState({fullname: ''});
+
   const handleSubmit = () => {
     navigation.navigate('media');
   };
+
+  const getDetailUsername = useCallback(async () => {
+    try {
+      const fetch = await http();
+      const response = await fetch.post('/auth/find-username', {
+        username: user,
+      });
+      setDetail(response.data);
+    } catch (error) {
+      //
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const getItemtoken = async (): Promise<any> => {
+      try {
+        const value = await AsyncStorage.getItem('username');
+        if (value !== null) {
+          setUser(value);
+          return value;
+        }
+      } catch (error) {
+        return '';
+      }
+    };
+    const getNews = async () => {
+      try {
+        const fetch = await http();
+        const response = await fetch.get('/news');
+        setDataNews(response.data.items);
+      } catch (error) {
+        //
+      }
+    };
+    getItemtoken();
+    getNews();
+    if (user) {
+      getDetailUsername();
+    }
+  }, [getDetailUsername, user]);
   return (
     <View>
       <View
@@ -48,7 +74,7 @@ const Home = ({navigation}: any) => {
           />
         </View>
         <Text style={{color: TEXT_LIGHT, fontSize: 16}}>
-          Selamat Datang Madun
+          Selamat Datang {detailUser.fullname}
         </Text>
       </View>
       <View
@@ -81,12 +107,12 @@ const Home = ({navigation}: any) => {
           horizontal
           style={{display: 'flex'}}
           showsHorizontalScrollIndicator={false}>
-          {dataArray.map(data => (
+          {dataNews.map(data => (
             <CardSlideHorizontal
               title={data.title}
               navigation={navigation}
-              imgSrc={data.imgSrc}
-              href={data.href}
+              imgSrc={data.linkUrl.replace('/', '%2f')}
+              href={data.id}
             />
           ))}
         </ScrollView>
