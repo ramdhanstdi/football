@@ -1,18 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from 'modules/auth/screens/Login';
 import Register from 'modules/auth/screens/Register';
 import ProfileInformation from 'modules/auth/screens/ProfileInformation';
 import BottomTabComponent from 'modules/home/components/BottomTab';
-import AboutTeam from 'modules/about/screens/AboutTeam';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useToken} from './TokenProvider';
+import MediaDetail from 'modules/media/screens/MediaDetail';
 
 const Stack = createNativeStackNavigator();
 
 const Main = () => {
-  const [token, setToken] = useState('');
+  const {token, setToken} = useToken();
 
   useEffect(() => {
     const getItemtoken = async (): Promise<any> => {
@@ -27,7 +28,7 @@ const Main = () => {
       }
     };
     getItemtoken();
-  }, [token]);
+  }, [setToken]);
   return (
     <NavigationContainer>
       {token ? (
@@ -39,8 +40,8 @@ const Main = () => {
           />
           <Stack.Screen
             options={{headerShown: false}}
-            name="AboutTeam"
-            component={AboutTeam}
+            name="MediaDetail"
+            component={MediaDetail}
           />
         </Stack.Navigator>
       ) : (

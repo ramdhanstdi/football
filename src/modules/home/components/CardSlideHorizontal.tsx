@@ -9,11 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {blobToBase64} from 'utils/image.utils';
 
 const windowWidth = Dimensions.get('window').width;
 
 const CardSlideHorizontal = ({navigation, title, href, imgSrc}: any) => {
-  const [preview, setPreview] = useState('');
+  const [preview, setPreview] = useState(
+    'https://cloud-atg.moph.go.th/quality/sites/default/files/default_images/default.png',
+  );
 
   const getImage = useCallback(async () => {
     if (imgSrc) {
@@ -38,17 +41,6 @@ const CardSlideHorizontal = ({navigation, title, href, imgSrc}: any) => {
     return null;
   }, [imgSrc]);
 
-  const blobToBase64 = (blob: any) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
-
   useEffect(() => {
     const convert = async () => {
       try {
@@ -66,13 +58,13 @@ const CardSlideHorizontal = ({navigation, title, href, imgSrc}: any) => {
           setPreview(base64String as string);
         }
       } catch (error) {
-        console.log(error);
+        //
       }
     };
     convert();
   }, [getImage, imgSrc]);
   return (
-    <View key={title}>
+    <View key={href}>
       <TouchableOpacity
         onPress={() => navigation.navigate({name: href})}
         style={styleLocal.card}>

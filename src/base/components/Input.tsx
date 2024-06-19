@@ -10,7 +10,15 @@ import React from 'react';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {TEXT_DARK} from 'assets/const/FontColor';
 
-const Input = ({icon, placeholder, onChangeText, onBlur, name}: any) => {
+const Input = ({
+  icon,
+  placeholder,
+  onChangeText,
+  onBlur,
+  name,
+  defaultValue,
+  disabled = true,
+}: any) => {
   const [show, setShow] = React.useState(true);
   return (
     <View
@@ -29,6 +37,8 @@ const Input = ({icon, placeholder, onChangeText, onBlur, name}: any) => {
             style={styleLocal.text}
             placeholder={placeholder}
             secureTextEntry={icon === 'lock' ? show : false}
+            defaultValue={defaultValue}
+            editable={disabled}
           />
           <View>
             {icon === 'lock' ? (

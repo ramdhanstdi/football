@@ -17,9 +17,9 @@ const FormLogin = ({
           onChangeText={handleChange}
           onBlur={handleBlur}
           icon="user"
-          placeholder="Masukkan email kamu"
+          placeholder="Masukkan username kamu"
           type="text"
-          name="Email"
+          name="Username"
         />
 
         <Input

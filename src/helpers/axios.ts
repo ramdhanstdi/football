@@ -11,6 +11,16 @@ const getItemtoken = async (): Promise<any> => {
     return '';
   }
 };
+const removeItemtoken = async (): Promise<any> => {
+  try {
+    const value = await AsyncStorage.removeItem('token');
+    if (value !== null) {
+      return value;
+    }
+  } catch (error) {
+    return '';
+  }
+};
 
 const http = async () => {
   let headers = {};
@@ -27,9 +37,10 @@ const http = async () => {
     response => {
       return response.data;
     },
-    error => {
-      console.log(error);
-
+    async error => {
+      if (error.response.data.statusCode) {
+        await removeItemtoken();
+      }
       return Promise.reject(error);
     },
   );

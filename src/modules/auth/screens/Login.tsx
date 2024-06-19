@@ -1,14 +1,16 @@
 import React, {useState} from 'react';
 import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
 import FormLogin from '../components/FormLogin';
-import {TEXT_DARK} from 'assets/const/FontColor';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {TEXT_DARK, TEXT_LIGHT, WARNING_COLOR} from 'assets/const/FontColor';
 import http from 'helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useToken} from 'main/TokenProvider';
 
 const Login = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
+  const [error, setError] = useState('');
+  const {setToken} = useToken();
 
   const setItemToken = async (token: string, username: string) => {
     try {
@@ -21,7 +23,7 @@ const Login = ({navigation}: any) => {
 
   const onSubmit = async (val: any) => {
     const objectValue = {
-      username: val.Email,
+      username: val.Username,
       password: val.Password,
       device: 'MOBILE',
     };
@@ -31,9 +33,9 @@ const Login = ({navigation}: any) => {
         ...objectValue,
       });
       setItemToken(response.data.token, response.data.user.username);
-      navigation.navigate('BottomTabComponent');
+      setToken(response.data.token);
     } catch (error) {
-      //
+      setError(error.response.data.message);
     }
   };
   const handleChange = (field: string, value: any) => {
@@ -53,6 +55,16 @@ const Login = ({navigation}: any) => {
   };
   return (
     <>
+      {error && (
+        <View
+          style={{
+            backgroundColor: WARNING_COLOR,
+            height: 40,
+            alignItems: 'center',
+          }}>
+          <Text style={{fontSize: 24, color: TEXT_LIGHT}}>{error}</Text>
+        </View>
+      )}
       <View
         style={{
           display: 'flex',
@@ -80,13 +92,6 @@ const Login = ({navigation}: any) => {
             handleSubmit={() => onSubmit(fieldForm)}
             formInvalid={inValid}
           />
-          <Text
-            style={styleLocal.skip}
-            onPress={() =>
-              navigation.navigate('BottomTabComponent', {screen: 'Home'})
-            }>
-            Lewati Proses Login <FontAwesome5 name="arrow-right" size={12} />
-          </Text>
         </View>
       </ScrollView>
     </>

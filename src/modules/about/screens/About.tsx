@@ -1,33 +1,45 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
-import {PRIMARY_COLOR} from 'assets/const/FontColor';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {PRIMARY_COLOR, TEXT_DARK} from 'assets/const/FontColor';
+import AboutDetail from '../components/AboutDetail';
 
 const About = () => {
+  const [section, setSection] = useState('about');
   return (
     <View>
-      <View style={styles.headBlock}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          padding: 8,
+          backgroundColor: '#fff',
+        }}>
+        <TouchableOpacity onPress={() => setSection('about')}>
+          <Text style={styles.textTitle}>About</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setSection('tim')}>
+          <Text style={styles.textTitle}>Tim</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setSection('profile')}>
+          <Text style={styles.textTitle}>Profile User</Text>
+        </TouchableOpacity>
+      </View>
+      {section === 'about' && (
         <View>
-          <Text style={styles.textTitle}>Tentang Persib</Text>
-          <Text>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque, modi
-            labore omnis neque voluptatibus eius illo excepturi sequi sit eaque
-            velit cumque beatae temporibus, praesentium sed nihil soluta
-            consectetur repellendus?
-          </Text>
+          <AboutDetail />
         </View>
-        <Image
-          source={require('assets/images/main.png')}
-          style={{width: 40, height: 40}}
-        />
-      </View>
-      <View style={{display: 'flex'}}>
-        <TouchableOpacity style={{width: '100%'}}>
-          <Text>Tentang</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{width: '100%'}}>
-          <Text>Tim</Text>
-        </TouchableOpacity>
-      </View>
+      )}
+      {section === 'tim' && (
+        <View>
+          <Text style={styles.textTitle}>Tim</Text>
+        </View>
+      )}
+      {section === 'profile' && (
+        <View>
+          <Text style={styles.textTitle}>Profile User</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -46,5 +58,6 @@ const styles = StyleSheet.create({
   textTitle: {
     fontSize: 16,
     fontWeight: '600',
+    color: TEXT_DARK,
   },
 });

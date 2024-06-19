@@ -1,4 +1,11 @@
-import {View, ScrollView, Image, Text} from 'react-native';
+import {
+  View,
+  ScrollView,
+  Image,
+  Text,
+  StyleSheet,
+  ImageBackground,
+} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import CardSlideHorizontal from '../components/CardSlideHorizontal';
 import Button from 'base/components/Button';
@@ -12,7 +19,7 @@ const Home = ({navigation}: any) => {
   const [detailUser, setDetail] = useState({fullname: ''});
 
   const handleSubmit = () => {
-    navigation.navigate('media');
+    navigation.navigate('Media');
   };
 
   const getDetailUsername = useCallback(async () => {
@@ -22,10 +29,16 @@ const Home = ({navigation}: any) => {
         username: user,
       });
       setDetail(response.data);
+      if (
+        response.data.members === 'INACTIVE' &&
+        response.data.type === 'INTERNAL'
+      ) {
+        navigation.navigate('setpassword');
+      }
     } catch (error) {
       //
     }
-  }, [user]);
+  }, [navigation, user]);
 
   useEffect(() => {
     const getItemtoken = async (): Promise<any> => {
@@ -42,7 +55,14 @@ const Home = ({navigation}: any) => {
     const getNews = async () => {
       try {
         const fetch = await http();
-        const response = await fetch.get('/news');
+        const response = await fetch.get('/news', {
+          params: {
+            sortBy: 'createdAt | DESC',
+            page: 1,
+            limit: 5,
+            status: 'published',
+          },
+        });
         setDataNews(response.data.items);
       } catch (error) {
         //
@@ -56,17 +76,7 @@ const Home = ({navigation}: any) => {
   }, [getDetailUsername, user]);
   return (
     <View>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          paddingHorizontal: 8,
-          paddingVertical: 12,
-          backgroundColor: PRIMARY_COLOR,
-          alignItems: 'center',
-          elevation: 10,
-        }}>
+      <View style={styles.header}>
         <View>
           <Image
             source={require('assets/images/main.png')}
@@ -77,32 +87,49 @@ const Home = ({navigation}: any) => {
           Selamat Datang {detailUser.fullname}
         </Text>
       </View>
+      <ImageBackground source={require('assets/images/bg-main.jpg')}>
+        <Text
+          style={{
+            color: TEXT_LIGHT,
+            fontSize: 20,
+            fontWeight: '600',
+            margin: 8,
+          }}>
+          Jadwal Latihan
+        </Text>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 20,
+            marginHorizontal: 8,
+          }}>
+          <View style={styles.cardLatihan}>
+            <Image
+              source={require('assets/images/main.png')}
+              style={{width: 50, height: 50}}
+            />
+            <Text style={{color: TEXT_DARK, fontSize: 20, fontWeight: '600'}}>
+              Selasa
+            </Text>
+          </View>
+          <View style={styles.cardLatihan}>
+            <Image
+              source={require('assets/images/main.png')}
+              style={{width: 50, height: 50}}
+            />
+            <Text style={{color: TEXT_DARK, fontSize: 20, fontWeight: '600'}}>
+              Jum'at
+            </Text>
+          </View>
+        </View>
+      </ImageBackground>
       <View
         style={{
           backgroundColor: '#fff',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 20,
-          padding: 12,
-          elevation: 10,
-          marginVertical: 8,
+          height: '70%',
         }}>
-        <Image
-          source={require('assets/images/main.png')}
-          style={{width: 50, height: 50}}
-        />
-        <Text style={{color: TEXT_DARK, fontSize: 24}}>VS</Text>
-        <Image
-          source={require('assets/images/main.png')}
-          style={{width: 50, height: 50}}
-        />
-      </View>
-      <View
-        style={{
-          backgroundColor: '#fff',
-          height: '75%',
-        }}>
+        <Text style={styles.title}>Berita Terbaru</Text>
         <ScrollView
           horizontal
           style={{display: 'flex'}}
@@ -131,3 +158,32 @@ const Home = ({navigation}: any) => {
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  cardLatihan: {
+    backgroundColor: '#fff',
+    gap: 20,
+    padding: 12,
+    elevation: 10,
+    marginVertical: 8,
+    flex: 1,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+    backgroundColor: PRIMARY_COLOR,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  title: {
+    color: TEXT_DARK,
+    fontSize: 20,
+    margin: 8,
+    fontWeight: '600',
+  },
+});

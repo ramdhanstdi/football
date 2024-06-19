@@ -2,14 +2,12 @@ import React, {useState} from 'react';
 import {View, Text, ScrollView, Image, StyleSheet} from 'react-native';
 import FormRegister from '../components/FormRegister';
 import {TEXT_DARK} from 'assets/const/FontColor';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 const Register = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
   const onSubmit = (val: any) => {
-    console.log(val);
-    navigation.navigate('ProfileInformation');
+    navigation.navigate('ProfileInformation', {data: val});
   };
   const handleChange = (field: string, value: any) => {
     setFieldForm(prevState => ({
@@ -56,10 +54,6 @@ const Register = ({navigation}: any) => {
             handleSubmit={() => onSubmit(fieldForm)}
             formInvalid={inValid}
           />
-          <Text style={styleLocal.skip} onPress={() => navigation.navigate('')}>
-            Lewati Proses Pendaftaran{' '}
-            <FontAwesome5 name="arrow-right" size={12} />
-          </Text>
         </View>
       </ScrollView>
     </>

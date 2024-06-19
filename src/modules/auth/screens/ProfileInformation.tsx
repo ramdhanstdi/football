@@ -1,23 +1,73 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
-import {TEXT_DARK} from 'assets/const/FontColor';
+import {
+  PRIMARY_COLOR,
+  SECONDARY_COLOR,
+  TEXT_DARK,
+} from 'assets/const/FontColor';
 import FormProfileInformation from '../components/FormProfileInformation';
+import {useRoute} from '@react-navigation/native';
+import http from 'helpers/axios';
 
 const ProfileInformation = ({navigation}: any) => {
-  const onSubmit = (val: any) => {
-    const email = val.email;
-    const password = val.password;
-    const request = {email, password};
-    console.log(request);
+  const [inValid, setInvalid] = useState(true);
+  const [fieldForm, setFieldForm] = useState({});
+  const [success, setSuccess] = useState(false);
+  const onSubmit = async (val: any) => {
+    const objectValue = {
+      username: val.Username,
+      fullname: val.Nama,
+      email: data.Email,
+      password: data.Password,
+    };
+
+    try {
+      const fetch = await http();
+      const response = await fetch.post('/auth/register', {
+        ...objectValue,
+      });
+
+      if (response) {
+        setSuccess(true);
+        setTimeout(() => {
+          navigation.navigate('Login');
+        }, 3000);
+      }
+    } catch (error) {
+      setSuccess(false);
+    }
   };
-  const handleChange = (val: any) => {
-    console.log(val);
+  const handleChange = (field: string, value: any) => {
+    setFieldForm(prevState => ({
+      ...prevState,
+      [field]: value,
+    }));
   };
-  const handleBlur = (val: any) => {
-    console.log(val);
+  const handleBlur = () => {
+    if (Object.keys(fieldForm).length >= 2) {
+      const isValid = Object.values(fieldForm).every(
+        val => val !== null && val !== '',
+      );
+      setInvalid(!isValid);
+    }
   };
+  const route = useRoute();
+  const {data} = route.params;
+
   return (
     <>
+      {success && (
+        <View
+          style={{
+            backgroundColor: SECONDARY_COLOR,
+            height: 40,
+            alignItems: 'center',
+          }}>
+          <Text style={{fontSize: 24, color: PRIMARY_COLOR}}>
+            Registrasi Berhasil Silahkan Login
+          </Text>
+        </View>
+      )}
       <View
         style={{
           display: 'flex',
@@ -42,8 +92,9 @@ const ProfileInformation = ({navigation}: any) => {
             navigation={navigation}
             handleChange={handleChange}
             handleBlur={handleBlur}
-            handleSubmit={onSubmit}
-            formInvalid={true}
+            handleSubmit={() => onSubmit(fieldForm)}
+            formInvalid={inValid}
+            initialValue={data}
           />
         </View>
       </ScrollView>

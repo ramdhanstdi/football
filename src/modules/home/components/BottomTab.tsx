@@ -6,9 +6,6 @@ import {PRIMARY_COLOR} from 'assets/const/FontColor';
 import Home from '../screens/Home';
 import Media from 'modules/media/screens/Media';
 import About from 'modules/about/screens/About';
-// import Transaction from './Transaction';
-// import History from './History';
-// import Profile from './Profile';
 
 const BottomTab = createBottomTabNavigator();
 

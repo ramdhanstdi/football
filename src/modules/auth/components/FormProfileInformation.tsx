@@ -10,7 +10,7 @@ const FormProfileInformation = ({
   handleChange,
   handleBlur,
   handleSubmit,
-  navigation,
+  initialValue,
   formInvalid,
 }: any) => {
   const [showPicker, setShowPicker] = useState(false);
@@ -29,7 +29,9 @@ const FormProfileInformation = ({
           onChangeText={handleChange}
           onBlur={handleBlur}
           type="text"
-          name="Alamat Email"
+          name="Email"
+          defaultValue={initialValue.Email}
+          disabled={false}
         />
 
         <Input
@@ -37,7 +39,18 @@ const FormProfileInformation = ({
           onBlur={handleBlur}
           placeholder="Password"
           type="text"
+          icon="lock"
           name="Password"
+          secure={true}
+          defaultValue={initialValue.Password}
+          disabled={false}
+        />
+
+        <Input
+          onChangeText={handleChange}
+          onBlur={handleBlur}
+          type="text"
+          name="Username"
         />
 
         <Input
@@ -45,7 +58,7 @@ const FormProfileInformation = ({
           onBlur={handleBlur}
           placeholder="Nama Lengkap"
           type="text"
-          name="Nama Lengkap"
+          name="Nama"
         />
 
         <Input
@@ -53,7 +66,7 @@ const FormProfileInformation = ({
           onBlur={handleBlur}
           placeholder="No. HP"
           type="text"
-          name="No. HP"
+          name="HP"
         />
         <View style={{border: 1, height: 50, marginVertical: 8}}>
           <Text style={{color: TEXT_DARK}}>Pilih Tanggal Lahir</Text>
