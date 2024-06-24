@@ -2,8 +2,9 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
 import {PRIMARY_COLOR, TEXT_DARK} from 'assets/const/FontColor';
 import AboutDetail from '../components/AboutDetail';
+import AboutTeam from '../components/AboutTeam';
 
-const About = () => {
+const About = ({navigation}) => {
   const [section, setSection] = useState('about');
   return (
     <View>
@@ -32,7 +33,7 @@ const About = () => {
       )}
       {section === 'tim' && (
         <View>
-          <Text style={styles.textTitle}>Tim</Text>
+          <AboutTeam navigation={navigation} />
         </View>
       )}
       {section === 'profile' && (

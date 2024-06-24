@@ -9,6 +9,7 @@ import BottomTabComponent from 'modules/home/components/BottomTab';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useToken} from './TokenProvider';
 import MediaDetail from 'modules/media/screens/MediaDetail';
+import UserDetail from 'modules/user/screens/UserDetail';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,11 @@ const Main = () => {
             options={{headerShown: false}}
             name="MediaDetail"
             component={MediaDetail}
+          />
+          <Stack.Screen
+            options={{headerShown: true, headerBackButtonMenuEnabled: true}}
+            name="UserDetail"
+            component={UserDetail}
           />
         </Stack.Navigator>
       ) : (
