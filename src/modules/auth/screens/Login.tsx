@@ -12,10 +12,15 @@ const Login = ({navigation}: any) => {
   const [error, setError] = useState('');
   const {setToken} = useToken();
 
-  const setItemToken = async (token: string, username: string) => {
+  const setItemToken = async (
+    token: string,
+    username: string,
+    userId: string,
+  ) => {
     try {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('username', username);
+      await AsyncStorage.setItem('userId', userId);
     } catch (error) {
       // Error saving data
     }
@@ -32,7 +37,13 @@ const Login = ({navigation}: any) => {
       const response = await fetch.post('/auth/login', {
         ...objectValue,
       });
-      setItemToken(response.data.token, response.data.user.username);
+      console.log(response.data, 'dataUser');
+
+      setItemToken(
+        response.data.token,
+        response.data.user.username,
+        response.data.user.id,
+      );
       setToken(response.data.token);
     } catch (error) {
       setError(error.response.data.message);

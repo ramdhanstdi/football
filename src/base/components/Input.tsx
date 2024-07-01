@@ -82,10 +82,10 @@ const styleLocal = StyleSheet.create({
     marginRight: 10,
   },
   text: {
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: '400',
-    color: '#666666',
-    paddingHorizontal: 12,
+    color: 'black',
+    paddingHorizontal: 8,
     flex: 2,
   },
 });

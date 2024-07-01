@@ -20,19 +20,19 @@ const UserDetail = () => {
   const route = useRoute();
   const {data} = route.params;
   const [dataProfile, setDataAbout] = useState({
-    address: 'Jl Industri',
-    birthDate: 946659600,
-    birthPlace: 'Bandung',
-    position: 'Kanan',
-    height: '172',
-    identityName: 'Coach-2',
-    identityNumber: '0002',
+    address: '',
+    birthDate: 0,
+    birthPlace: '',
+    position: '',
+    height: '',
+    identityName: '',
+    identityNumber: '',
     linkUrl: null,
-    nationality: 'Indonesia',
+    nationality: '',
     users: {
       fullname: '',
     },
-    weight: '78',
+    weight: '',
   });
   const getImage = useCallback(async () => {
     if (dataProfile.linkUrl) {
@@ -78,7 +78,7 @@ const UserDetail = () => {
         //
       }
     };
-    const getAbout = async () => {
+    const getProfile = async () => {
       try {
         const fetch = await http();
         const response = await fetch.get(`/members/${data}`);
@@ -89,7 +89,7 @@ const UserDetail = () => {
       }
     };
 
-    getAbout();
+    getProfile();
   }, [getImage, dataProfile.linkUrl, data]);
   return (
     <ScrollView style={{margin: 30}}>

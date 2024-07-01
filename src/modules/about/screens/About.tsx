@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {PRIMARY_COLOR, TEXT_DARK} from 'assets/const/FontColor';
 import AboutDetail from '../components/AboutDetail';
 import AboutTeam from '../components/AboutTeam';
+import AboutProfile from '../components/AboutProfile';
 
 const About = ({navigation}) => {
   const [section, setSection] = useState('about');
@@ -38,7 +39,7 @@ const About = ({navigation}) => {
       )}
       {section === 'profile' && (
         <View>
-          <Text style={styles.textTitle}>Profile User</Text>
+          <AboutProfile navigation={navigation} />
         </View>
       )}
     </View>
