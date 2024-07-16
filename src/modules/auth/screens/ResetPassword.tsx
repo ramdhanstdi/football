@@ -1,52 +1,47 @@
 import React, {useState} from 'react';
 import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
-import FormLogin from '../components/FormLogin';
 import {TEXT_DARK, TEXT_LIGHT, WARNING_COLOR} from 'assets/const/FontColor';
 import http from 'helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useToken} from 'main/TokenProvider';
+import FormResetPassword from '../components/FormResetPassword';
 
-const Login = ({navigation}: any) => {
+const ResetPassword = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
   const [error, setError] = useState('');
   const {setToken} = useToken();
-
-  const setItemToken = async (
-    token: string,
-    username: string,
-    userId: string,
-  ) => {
-    try {
-      await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('username', username);
-      await AsyncStorage.setItem('userId', userId);
-    } catch (error) {
-      // Error saving data
-    }
-  };
+  const [idUser, setIdUser] = useState({type: '', id: ''});
 
   const onSubmit = async (val: any) => {
     const objectValue = {
       username: val.Username,
       password: val.Password,
-      device: 'MOBILE',
     };
-    try {
-      const fetch = await http();
-      const response = await fetch.post('/auth/mobile/login', {
-        ...objectValue,
-      });
-      console.log(response.data, 'dataUser');
-
-      setItemToken(
-        response.data.token,
-        response.data.user.username,
-        response.data.user.id,
-      );
-      setToken(response.data.token);
-    } catch (error) {
-      setError(error.response.data.message);
+    if (!idUser) {
+      try {
+        const fetch = await http();
+        const response = await fetch.post('/auth/find-username', {
+          ...objectValue,
+        });
+        setIdUser({id: response.data.id, type: response.data.type});
+        await fetch.post(`/auth/reset-password/${response.data.id}`);
+      } catch (error) {
+        setError(error.response.data.message);
+      }
+    } else {
+      try {
+        const fetch = await http();
+        const response = await fetch.post(
+          `/auth/set-new-password/${idUser.id}/${idUser.type}`,
+          {
+            ...objectValue,
+          },
+        );
+        setIdUser(response.data.id);
+      } catch (error) {
+        setError(error.response.data.message);
+      }
     }
   };
   const handleChange = (field: string, value: any) => {
@@ -90,13 +85,14 @@ const Login = ({navigation}: any) => {
         />
       </View>
       <ScrollView style={{margin: 10, marginTop: -100}}>
-        <View style={styleLocal.cardLogin}>
+        <View style={styleLocal.cardResetPassword}>
           <View>
             <Text style={{fontSize: 20, fontWeight: 500, color: TEXT_DARK}}>
-              Masuk
+              {idUser.id ? 'Reset Password' : 'Cari User'}
             </Text>
           </View>
-          <FormLogin
+          <FormResetPassword
+            idUser={idUser.id}
             navigation={navigation}
             handleChange={handleChange}
             handleBlur={handleBlur}
@@ -109,7 +105,7 @@ const Login = ({navigation}: any) => {
   );
 };
 
-export default Login;
+export default ResetPassword;
 
 const styleLocal = StyleSheet.create({
   skip: {
@@ -117,7 +113,7 @@ const styleLocal = StyleSheet.create({
     textAlign: 'center',
     margin: 8,
   },
-  cardLogin: {
+  cardResetPassword: {
     padding: 16,
     backgroundColor: '#ffffff',
     borderRadius: 16,
