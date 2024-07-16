@@ -79,7 +79,7 @@ const Home = ({navigation}: any) => {
       <View style={styles.header}>
         <View>
           <Image
-            source={require('assets/images/main.png')}
+            source={require('assets/images/main.jpeg')}
             style={{width: 40, height: 40}}
           />
         </View>
@@ -106,7 +106,7 @@ const Home = ({navigation}: any) => {
           }}>
           <View style={styles.cardLatihan}>
             <Image
-              source={require('assets/images/main.png')}
+              source={require('assets/images/main.jpeg')}
               style={{width: 50, height: 50}}
             />
             <Text style={{color: TEXT_DARK, fontSize: 20, fontWeight: '600'}}>
@@ -115,7 +115,7 @@ const Home = ({navigation}: any) => {
           </View>
           <View style={styles.cardLatihan}>
             <Image
-              source={require('assets/images/main.png')}
+              source={require('assets/images/main.jpeg')}
               style={{width: 50, height: 50}}
             />
             <Text style={{color: TEXT_DARK, fontSize: 20, fontWeight: '600'}}>

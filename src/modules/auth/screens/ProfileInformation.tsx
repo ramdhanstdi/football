@@ -77,7 +77,7 @@ const ProfileInformation = ({navigation}: any) => {
           height: 300,
         }}>
         <Image
-          source={require('assets/images/main.png')}
+          source={require('assets/images/main.jpeg')}
           style={{width: 90, height: 90, marginTop: 40}}
         />
       </View>
