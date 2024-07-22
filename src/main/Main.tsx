@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useToken} from './TokenProvider';
 import MediaDetail from 'modules/media/screens/MediaDetail';
 import UserDetail from 'modules/user/screens/UserDetail';
+import ResetPassword from 'modules/auth/screens/ResetPassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +62,11 @@ const Main = () => {
             options={{headerShown: false}}
             name="Register"
             component={Register}
+          />
+          <Stack.Screen
+            options={{headerShown: false}}
+            name="ResetPassword"
+            component={ResetPassword}
           />
           <Stack.Screen
             options={{headerShown: false}}

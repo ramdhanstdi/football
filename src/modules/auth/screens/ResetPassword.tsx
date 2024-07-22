@@ -1,16 +1,19 @@
 import React, {useState} from 'react';
 import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
-import {TEXT_DARK, TEXT_LIGHT, WARNING_COLOR} from 'assets/const/FontColor';
+import {
+  SUCCESS_COLOR,
+  TEXT_DARK,
+  TEXT_LIGHT,
+  WARNING_COLOR,
+} from 'assets/const/FontColor';
 import http from 'helpers/axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useToken} from 'main/TokenProvider';
 import FormResetPassword from '../components/FormResetPassword';
 
 const ResetPassword = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
   const [error, setError] = useState('');
-  const {setToken} = useToken();
+  const [success, setSuccess] = useState('');
   const [idUser, setIdUser] = useState({type: '', id: ''});
 
   const onSubmit = async (val: any) => {
@@ -26,6 +29,7 @@ const ResetPassword = ({navigation}: any) => {
         });
         setIdUser({id: response.data.id, type: response.data.type});
         await fetch.post(`/auth/reset-password/${response.data.id}`);
+        setSuccess('User Ditemukan Silahkan Reset Password');
       } catch (error) {
         setError(error.response.data.message);
       }
@@ -39,6 +43,8 @@ const ResetPassword = ({navigation}: any) => {
           },
         );
         setIdUser(response.data.id);
+        setSuccess('Berhasil Reset Password Silahkan Login');
+        setTimeout(() => navigation.navigate('Login'), 3000);
       } catch (error) {
         setError(error.response.data.message);
       }
@@ -61,14 +67,16 @@ const ResetPassword = ({navigation}: any) => {
   };
   return (
     <>
-      {error && (
+      {(error || success) && (
         <View
           style={{
-            backgroundColor: WARNING_COLOR,
+            backgroundColor: error ? WARNING_COLOR : SUCCESS_COLOR,
             height: 40,
             alignItems: 'center',
           }}>
-          <Text style={{fontSize: 24, color: TEXT_LIGHT}}>{error}</Text>
+          <Text style={{fontSize: 24, color: TEXT_LIGHT}}>
+            {error || success}
+          </Text>
         </View>
       )}
       <View
