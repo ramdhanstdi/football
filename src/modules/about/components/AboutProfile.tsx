@@ -16,6 +16,7 @@ import Select from 'base/components/Select';
 import {PRIMARY_COLOR, SECONDARY_COLOR} from 'assets/const/FontColor';
 import Button from 'base/components/Button';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import {useToken} from 'main/TokenProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -69,6 +70,7 @@ const AboutProfile = ({navigation}) => {
   const [isTransaction, setIsTransaction] = useState('');
   const [success, setSuccess] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const {setToken} = useToken();
 
   const handleDateChange = (event, date) => {
     if (date !== undefined) {
@@ -80,11 +82,27 @@ const AboutProfile = ({navigation}) => {
     setShowPicker(false);
   };
 
+  const removeItemtoken = async (): Promise<any> => {
+    try {
+      const value = await AsyncStorage.removeItem('token');
+      if (value !== null) {
+        return value;
+      }
+    } catch (error) {
+      return '';
+    }
+  };
+
   const handleChange = (field: string, value: any) => {
     setFieldForm(prevState => ({
       ...prevState,
       [field]: value,
     }));
+  };
+
+  const logOut = async () => {
+    await removeItemtoken();
+    setToken('');
   };
 
   const onSubmit = async () => {
@@ -229,6 +247,24 @@ const AboutProfile = ({navigation}) => {
       style={{
         marginHorizontal: 'auto',
       }}>
+      <View
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          flexDirection: 'row',
+        }}>
+        <Button
+          action={logOut}
+          title="submit"
+          text="Logout"
+          variant="primary"
+          style={{
+            width: 50,
+            heigth: 10,
+            marginTop: 24,
+          }}
+        />
+      </View>
       {success && (
         <View
           style={{
