@@ -11,6 +11,7 @@ import {useToken} from './TokenProvider';
 import MediaDetail from 'modules/media/screens/MediaDetail';
 import UserDetail from 'modules/user/screens/UserDetail';
 import ResetPassword from 'modules/auth/screens/ResetPassword';
+import UserTransaction from 'modules/user/screens/UserTransaction';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,11 @@ const Main = () => {
             options={{headerShown: true, headerBackButtonMenuEnabled: true}}
             name="UserDetail"
             component={UserDetail}
+          />
+          <Stack.Screen
+            options={{headerShown: true, headerBackButtonMenuEnabled: true}}
+            name="UserTransaction"
+            component={UserTransaction}
           />
         </Stack.Navigator>
       ) : (

@@ -14,11 +14,10 @@ import {PRIMARY_COLOR, TEXT_DARK} from 'assets/const/FontColor';
 import Button from 'base/components/Button';
 const windowWidth = Dimensions.get('window').width;
 
-const UserDetail = ({navigation}) => {
+const UserTransaction = () => {
   const [preview, setPreview] = useState(
     'https://cloud-atg.moph.go.th/quality/sites/default/files/default_images/default.png',
   );
-  const [isTransaction, setIsTransaction] = useState(false);
   const route = useRoute();
   const {data} = route.params;
   const [dataProfile, setDataAbout] = useState({
@@ -84,8 +83,6 @@ const UserDetail = ({navigation}) => {
       try {
         const fetch = await http();
         const response = await fetch.get(`/members/${data}`);
-        const hasTransaction = await fetch.get(`/transactions/member/${data}`);
-        setIsTransaction(hasTransaction);
         setDataAbout(response.data);
         convert();
       } catch (error) {
@@ -140,16 +137,12 @@ const UserDetail = ({navigation}) => {
         <Text style={styles.textList}>Kewarganegaraan</Text>
         <Text style={styles.textList}>{dataProfile.nationality}</Text>
       </View>
-      {isTransaction && (
-        <Button action={() => navigation.navigate('UserTransaction')}>
-          Daftar Anggota
-        </Button>
-      )}
+      <Button>Daftar Anggota</Button>
     </ScrollView>
   );
 };
 
-export default UserDetail;
+export default UserTransaction;
 
 const styles = StyleSheet.create({
   titleText: {fontSize: 24, color: TEXT_DARK, fontWeight: '600', marginTop: 8},

@@ -65,6 +65,8 @@ const AboutProfile = ({navigation}) => {
   const OPTIONS_NATIONALITY = ['WNI', 'WNA'];
   const OPTIONS_RELIGION = ['ISLAM', 'KRISTEN', 'HINDU', 'BUDDHA', 'KONGHUCU'];
   const [idUser, setIdUser] = useState('');
+  const [statusMember, setStatusMember] = useState('');
+  const [isTransaction, setIsTransaction] = useState('');
   const [success, setSuccess] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
 
@@ -86,10 +88,27 @@ const AboutProfile = ({navigation}) => {
   };
 
   const onSubmit = async () => {
+    const fetch = await http();
+    if (statusMember === 'INACTIVE' && !isEdit) {
+      setIsEdit(true);
+      return;
+    }
+    if (statusMember === 'INACTIVE' && isEdit) {
+      try {
+        const response = await fetch.post('/transactions', {
+          ...fieldForm,
+          playerId: idUser,
+          id: idUser,
+        });
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+      return;
+    }
     if (isEdit) {
       setIsEdit(false);
       try {
-        const fetch = await http();
         await fetch.put(`/members/${idUser}`, {
           ...fieldForm,
         });
@@ -108,7 +127,10 @@ const AboutProfile = ({navigation}) => {
   const getIdProfile = async () => {
     try {
       const value = await AsyncStorage.getItem('userId');
+      const status = await AsyncStorage.getItem('status');
       setIdUser(value);
+      setStatusMember(status);
+      console.log(status);
     } catch (error) {
       // Error saving data
     }
@@ -163,6 +185,9 @@ const AboutProfile = ({navigation}) => {
       try {
         const fetch = await http();
         const response = await fetch.get(`/members/${idUser}`);
+        const transaction = await fetch.get(`/transactions/member/${idUser}`);
+
+        setIsTransaction(transaction.data.status);
         setDataProfile(response.data);
         setFieldForm(prevState => ({
           ...prevState,
@@ -216,130 +241,172 @@ const AboutProfile = ({navigation}) => {
           </Text>
         </View>
       )}
-      <Image
-        style={styles.image}
-        source={{
-          uri: preview,
-        }}
-      />
-      <View>
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="identityName"
-          defaultValue={dataProfile.identityName}
-          disabled={isEdit}
+      {statusMember !== 'INACTIVE' && (
+        <Image
+          style={styles.image}
+          source={{
+            uri: preview,
+          }}
         />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="identityNumber"
-          defaultValue={dataProfile.identityNumber}
-          disabled={isEdit}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="username"
-          defaultValue={dataProfile.users?.username}
-          disabled={isEdit}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="email"
-          defaultValue={dataProfile.email}
-          disabled={isEdit}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="phoneNumber"
-          defaultValue={dataProfile.phoneNumber}
-          disabled={isEdit}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="birthPlace"
-          defaultValue={dataProfile.birthPlace}
-          disabled={isEdit}
-        />
-        <View style={{border: 1, height: 50, marginVertical: 8}}>
-          <Text>birthDate</Text>
-          <TouchableOpacity
-            onPress={() => setShowPicker(true)}
-            style={{
-              borderWidth: 0.5,
-              paddingHorizontal: 12,
-              height: 45,
-              borderRadius: 8,
-              paddingTop: 8,
-            }}>
-            <Text>{fieldForm.birthDate.toDateString()}</Text>
-          </TouchableOpacity>
-        </View>
-        {showPicker && (
-          <RNDateTimePicker
-            mode="date"
-            value={fieldForm.birthDate || dataProfile.birthDate}
-            onChange={handleDateChange}
-            style={{height: 20}}
+      )}
+      {statusMember !== 'INACTIVE' ||
+        (isEdit && (
+          <View>
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="identityName"
+              defaultValue={dataProfile.identityName}
+              disabled={isEdit}
+            />
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="identityNumber"
+              defaultValue={dataProfile.identityNumber}
+              disabled={isEdit}
+            />
+            {statusMember !== 'INACTIVE' && (
+              <Input
+                onChangeText={handleChange}
+                type="text"
+                name="username"
+                defaultValue={dataProfile.users?.username}
+                disabled={isEdit}
+              />
+            )}
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="email"
+              defaultValue={dataProfile.email}
+              disabled={isEdit}
+            />
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="phoneNumber"
+              defaultValue={dataProfile.phoneNumber}
+              disabled={isEdit}
+            />
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="birthPlace"
+              defaultValue={dataProfile.birthPlace}
+              disabled={isEdit}
+            />
+            <View style={{border: 1, height: 50, marginVertical: 8}}>
+              <Text>birthDate</Text>
+              <TouchableOpacity
+                onPress={() => setShowPicker(true)}
+                style={{
+                  borderWidth: 0.5,
+                  paddingHorizontal: 12,
+                  height: 45,
+                  borderRadius: 8,
+                  paddingTop: 8,
+                }}>
+                <Text>{fieldForm.birthDate.toDateString()}</Text>
+              </TouchableOpacity>
+            </View>
+            {showPicker && (
+              <RNDateTimePicker
+                mode="date"
+                value={fieldForm.birthDate || dataProfile.birthDate}
+                onChange={handleDateChange}
+                style={{height: 20}}
+              />
+            )}
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="address"
+              defaultValue={dataProfile.address}
+              disabled={isEdit}
+            />
+            <Select
+              handleChange={handleChange}
+              title="nationality"
+              defaultValue={dataProfile.nationality}
+              value={fieldForm.nationality}
+              disabled={isEdit}
+              options={OPTIONS_NATIONALITY}
+            />
+            <Select
+              handleChange={handleChange}
+              title="religion"
+              defaultValue={dataProfile.religion}
+              value={fieldForm.religion}
+              disabled={isEdit}
+              options={OPTIONS_RELIGION}
+            />
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="weight"
+              defaultValue={dataProfile.weight}
+              disabled={isEdit}
+            />
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="height"
+              defaultValue={dataProfile.height}
+              disabled={isEdit}
+            />
+            <Input
+              onChangeText={handleChange}
+              type="text"
+              name="bio"
+              defaultValue={fieldForm.bio}
+              disabled={isEdit}
+            />
+            {(fieldForm.backName || statusMember === 'INACTIVE') && (
+              <Input
+                onChangeText={handleChange}
+                type="text"
+                name="backName"
+                defaultValue={fieldForm?.backName}
+                disabled={isEdit}
+              />
+            )}
+            {(fieldForm?.backNumber || statusMember === 'INACTIVE') && (
+              <Input
+                onChangeText={handleChange}
+                type="text"
+                name="backNumber"
+                defaultValue={fieldForm?.backNumber}
+                disabled={isEdit}
+              />
+            )}
+          </View>
+        ))}
+      {statusMember !== 'INACTIVE' ? (
+        <View style={{marginTop: 24, marginBottom: 80}}>
+          <Button
+            action={onSubmit}
+            title="submit"
+            text={isEdit ? 'Simpan' : 'Edit'}
+            variant="primary"
           />
-        )}
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="address"
-          defaultValue={dataProfile.address}
-          disabled={isEdit}
-        />
-        <Select
-          handleChange={handleChange}
-          title="nationality"
-          defaultValue={dataProfile.nationality}
-          value={fieldForm.nationality}
-          disabled={isEdit}
-          options={OPTIONS_NATIONALITY}
-        />
-        <Select
-          handleChange={handleChange}
-          title="religion"
-          defaultValue={dataProfile.religion}
-          value={fieldForm.religion}
-          disabled={isEdit}
-          options={OPTIONS_RELIGION}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="weight"
-          defaultValue={dataProfile.weight}
-          disabled={isEdit}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="height"
-          defaultValue={dataProfile.height}
-          disabled={isEdit}
-        />
-        <Input
-          onChangeText={handleChange}
-          type="text"
-          name="bio"
-          defaultValue={fieldForm.bio}
-          disabled={isEdit}
-        />
-      </View>
-      <View style={{marginTop: 24, marginBottom: 80}}>
-        <Button
-          action={onSubmit}
-          title="submit"
-          text={isEdit ? 'Simpan' : 'Edit'}
-          variant="primary"
-        />
-      </View>
+        </View>
+      ) : (
+        <View style={{marginTop: 24, marginBottom: 65}}>
+          {!isEdit && (
+            <Text style={{fontSize: 16, fontWeight: '600', padding: 12}}>
+              Akun ini belum aktif mohon klik aktifasi transaksi untuk
+              melanjutkan halaman ini
+            </Text>
+          )}
+          <Button
+            action={onSubmit}
+            title="submit"
+            text={'Daftar Transaksi'}
+            variant="primary"
+          />
+        </View>
+      )}
     </ScrollView>
   );
 };

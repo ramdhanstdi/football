@@ -16,11 +16,13 @@ const Login = ({navigation}: any) => {
     token: string,
     username: string,
     userId: string,
+    status: string,
   ) => {
     try {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('username', username);
       await AsyncStorage.setItem('userId', userId);
+      await AsyncStorage.setItem('status', status);
     } catch (error) {
       // Error saving data
     }
@@ -37,12 +39,13 @@ const Login = ({navigation}: any) => {
       const response = await fetch.post('/auth/mobile/login', {
         ...objectValue,
       });
-      console.log(response.data, 'dataUser');
+      console.log(response.data.user.members.status, 'dataUser');
 
       setItemToken(
         response.data.token,
         response.data.user.username,
         response.data.user.id,
+        response.data.user.members.status,
       );
       setToken(response.data.token);
     } catch (error) {

@@ -66,7 +66,7 @@ const CardSlideHorizontal = ({navigation, title, href, imgSrc}: any) => {
   return (
     <View key={href}>
       <TouchableOpacity
-        onPress={() => navigation.navigate({name: href})}
+        onPress={() => navigation.navigate('MediaDetail', {data: href})}
         style={styleLocal.card}>
         <Image
           style={styleLocal.image}
