@@ -12,6 +12,7 @@ import MediaDetail from 'modules/media/screens/MediaDetail';
 import UserDetail from 'modules/user/screens/UserDetail';
 import ResetPassword from 'modules/auth/screens/ResetPassword';
 import UserTransaction from 'modules/user/screens/UserTransaction';
+import CheckTransaction from 'modules/payment/screens/CheckTransaction';
 
 const Stack = createNativeStackNavigator();
 
@@ -55,6 +56,11 @@ const Main = () => {
             options={{headerShown: true, headerBackButtonMenuEnabled: true}}
             name="UserTransaction"
             component={UserTransaction}
+          />
+          <Stack.Screen
+            options={{headerShown: false}}
+            name="CheckTransaction"
+            component={CheckTransaction}
           />
         </Stack.Navigator>
       ) : (

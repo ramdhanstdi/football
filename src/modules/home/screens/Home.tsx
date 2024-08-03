@@ -84,7 +84,7 @@ const Home = ({navigation}: any) => {
           />
         </View>
         <Text style={{color: TEXT_LIGHT, fontSize: 16}}>
-          Selamat Datang {detailUser.fullname}
+          Selamat Datang {detailUser?.fullname}
         </Text>
       </View>
       <ImageBackground source={require('assets/images/bg-main.jpg')}>

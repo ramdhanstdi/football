@@ -39,12 +39,12 @@ const Login = ({navigation}: any) => {
       const response = await fetch.post('/auth/mobile/login', {
         ...objectValue,
       });
-      console.log(response.data.user.members.status, 'dataUser');
+      console.log(response.data);
 
       setItemToken(
         response.data.token,
         response.data.user.username,
-        response.data.user.id,
+        response.data.user.members.id,
         response.data.user.members.status,
       );
       setToken(response.data.token);
