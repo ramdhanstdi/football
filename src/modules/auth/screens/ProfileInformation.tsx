@@ -4,6 +4,7 @@ import {
   PRIMARY_COLOR,
   SECONDARY_COLOR,
   TEXT_DARK,
+  WARNING_COLOR,
 } from 'assets/const/FontColor';
 import FormProfileInformation from '../components/FormProfileInformation';
 import {useRoute} from '@react-navigation/native';
@@ -12,7 +13,7 @@ import http from 'helpers/axios';
 const ProfileInformation = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
-  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState('');
   const onSubmit = async (val: any) => {
     const objectValue = {
       username: val.Username,
@@ -28,13 +29,13 @@ const ProfileInformation = ({navigation}: any) => {
       });
 
       if (response) {
-        setSuccess(true);
+        setMessage('Registrasi Berhasil Silahkan Login');
         setTimeout(() => {
           navigation.navigate('Login');
         }, 3000);
       }
     } catch (error) {
-      setSuccess(false);
+      setMessage(error.response.data.message[0]);
     }
   };
   const handleChange = (field: string, value: any) => {
@@ -56,15 +57,23 @@ const ProfileInformation = ({navigation}: any) => {
 
   return (
     <>
-      {success && (
+      {message && (
         <View
           style={{
-            backgroundColor: SECONDARY_COLOR,
-            height: 40,
+            backgroundColor: message.includes('Berhasil')
+              ? SECONDARY_COLOR
+              : WARNING_COLOR,
+            height: 50,
             alignItems: 'center',
           }}>
-          <Text style={{fontSize: 24, color: PRIMARY_COLOR}}>
-            Registrasi Berhasil Silahkan Login
+          <Text
+            style={{
+              fontSize: 24,
+              color: message.includes('Berhasil')
+                ? PRIMARY_COLOR
+                : SECONDARY_COLOR,
+            }}>
+            {message}
           </Text>
         </View>
       )}
