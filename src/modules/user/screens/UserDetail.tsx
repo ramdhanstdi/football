@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
   textList: {
     fontSize: 16,
     fontWeight: '700',
+    color: TEXT_DARK,
   },
   image: {
     borderRadius: 8,
