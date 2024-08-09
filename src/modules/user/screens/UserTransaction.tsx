@@ -93,7 +93,7 @@ const UserTransaction = () => {
     getProfile();
   }, [getImage, dataProfile.linkUrl, data]);
   return (
-    <ScrollView style={{margin: 30}}>
+    <ScrollView style={{padding: 30}}>
       <Text style={styles.titleText}>Pemain Klub</Text>
       <View style={styles.bottomBar} />
       <Image
