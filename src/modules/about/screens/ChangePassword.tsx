@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
 import {
   SUCCESS_COLOR,
@@ -7,48 +7,37 @@ import {
   WARNING_COLOR,
 } from 'assets/const/FontColor';
 import http from 'helpers/axios';
-import FormResetPassword from '../components/FormResetPassword';
+import FormResetPassword from 'modules/auth/components/FormResetPassword';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ResetPassword = ({navigation}: any) => {
+const ChangePassword = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [idUser, setIdUser] = useState({type: '', id: ''});
+  const [idUser, setIdUser] = useState({type: 'Player', id: ''});
 
   const onSubmit = async (val: any) => {
-    const fetch = await http();
     const objectValue = {
       username: val.Username,
       password: val.Password,
     };
-    if (!idUser.id) {
+    if (idUser.id) {
       try {
-        const response = await fetch.post('/auth/find-username', {
+        const fetch = await http();
+        await fetch.post(`/auth/reset-password/${idUser.id}`);
+        await fetch.post(`/auth/set-new-password/${idUser.id}/${idUser.type}`, {
           ...objectValue,
         });
-        setIdUser({id: response.data.id, type: response.data.type});
-        await fetch.post(`/auth/reset-password/${response.data.id}`);
-        setSuccess('User Ditemukan Silahkan Reset Password');
+        setSuccess('Berhasil Ganti Password');
+        setTimeout(() => navigation.navigate('BottomTabComponent'), 3000);
       } catch (error) {
-        setError(error.response.data.message);
-      }
-    } else {
-      try {
-        const response = await fetch.post(
-          `/auth/set-new-password/${idUser.id}/${idUser.type}`,
-          {
-            ...objectValue,
-          },
-        );
-        setIdUser(response.data.id);
-        setSuccess('Berhasil Reset Password Silahkan Login');
-        setTimeout(() => navigation.navigate('Login'), 3000);
-      } catch (error) {
+        console.log(error);
         setError(error.response.data.message);
       }
     }
   };
+
   const handleChange = (field: string, value: any) => {
     setFieldForm(prevState => ({
       ...prevState,
@@ -64,6 +53,15 @@ const ResetPassword = ({navigation}: any) => {
       setInvalid(!isValid);
     }
   };
+
+  useEffect(() => {
+    const getIdProfile = async () => {
+      const value = await AsyncStorage.getItem('userId');
+      setIdUser(prevState => ({...prevState, id: value as string}));
+    };
+    getIdProfile();
+  }, []);
+
   return (
     <>
       {(error || success) && (
@@ -92,7 +90,7 @@ const ResetPassword = ({navigation}: any) => {
         />
       </View>
       <ScrollView style={{margin: 10, marginTop: -100}}>
-        <View style={styleLocal.cardResetPassword}>
+        <View style={styleLocal.cardChangePassword}>
           <View>
             <Text style={{fontSize: 20, fontWeight: 500, color: TEXT_DARK}}>
               {idUser.id ? 'Reset Password' : 'Cari User'}
@@ -104,6 +102,7 @@ const ResetPassword = ({navigation}: any) => {
             handleChange={handleChange}
             handleBlur={handleBlur}
             handleSubmit={() => onSubmit(fieldForm)}
+            formInvalid={inValid}
           />
         </View>
       </ScrollView>
@@ -111,7 +110,7 @@ const ResetPassword = ({navigation}: any) => {
   );
 };
 
-export default ResetPassword;
+export default ChangePassword;
 
 const styleLocal = StyleSheet.create({
   skip: {
@@ -119,7 +118,7 @@ const styleLocal = StyleSheet.create({
     textAlign: 'center',
     margin: 8,
   },
-  cardResetPassword: {
+  cardChangePassword: {
     padding: 16,
     backgroundColor: '#ffffff',
     borderRadius: 16,

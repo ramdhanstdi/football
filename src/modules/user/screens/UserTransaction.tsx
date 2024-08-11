@@ -4,37 +4,115 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import http from 'helpers/axios';
 import {blobToBase64} from 'utils/image.utils';
-import {useRoute} from '@react-navigation/native';
-import {PRIMARY_COLOR, TEXT_DARK} from 'assets/const/FontColor';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Input from 'base/components/Input';
+import Select from 'base/components/Select';
+import {PRIMARY_COLOR, SECONDARY_COLOR} from 'assets/const/FontColor';
 import Button from 'base/components/Button';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import {useToken} from 'main/TokenProvider';
+import {useFocus} from 'helpers/useFocus';
+
 const windowWidth = Dimensions.get('window').width;
 
-const UserTransaction = () => {
+const UserTransaction = ({navigation}) => {
   const [preview, setPreview] = useState(
     'https://cloud-atg.moph.go.th/quality/sites/default/files/default_images/default.png',
   );
-  const route = useRoute();
-  const {data} = route.params;
-  const [dataProfile, setDataAbout] = useState({
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [fieldForm, setFieldForm] = useState({
+    identityName: '',
+    identityNumber: '',
+    username: '',
+    isRelation: '',
+    email: '.',
+    phoneNumber: '',
+    birthPlace: '',
+    birthDate: new Date(),
     address: '',
-    birthDate: 0,
+    nationality: '',
+    religion: '',
+    weight: '',
+    height: '',
+    bio: '',
+    status: '',
+    id: '',
+  });
+  const [dataProfile, setDataProfile] = useState({
+    id: '',
+    address: '',
+    birthDate: new Date(),
     birthPlace: '',
     position: '',
     height: '',
+    email: '',
     identityName: '',
     identityNumber: '',
-    linkUrl: null,
+    linkUrl: '',
+    phoneNumber: '',
     nationality: '',
+    religion: '',
     users: {
       fullname: '',
+      username: '',
     },
     weight: '',
   });
+  const OPTIONS_NATIONALITY = ['WNI', 'WNA'];
+  const OPTIONS_RELIGION = ['ISLAM', 'KRISTEN', 'HINDU', 'BUDDHA', 'KONGHUCU'];
+  const [idUser, setIdUser] = useState('');
+  const [statusMember, setStatusMember] = useState('');
+  const [isTransaction, setIsTransaction] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const {focusCount, isFocused} = useFocus();
+
+  const handleDateChange = (event, date) => {
+    if (date !== undefined) {
+      setFieldForm(prevState => ({
+        ...prevState,
+        birthDate: date,
+      }));
+    }
+    setShowPicker(false);
+  };
+
+  const handleChange = (field: string, value: any) => {
+    setFieldForm(prevState => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  const onSubmit = async () => {
+    const fetch = await http();
+    try {
+      const response = await fetch.post('/transactions', {
+        ...fieldForm,
+        id: idUser,
+      });
+      navigation.navigate('CheckTransaction');
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+    return;
+  };
+
+  const getIdProfile = async () => {
+    try {
+      const value = await AsyncStorage.getItem('userId');
+      setIdUser(value);
+    } catch (error) {
+      // Error saving data
+    }
+  };
   const getImage = useCallback(async () => {
     if (dataProfile.linkUrl) {
       const controller = new AbortController();
@@ -59,10 +137,12 @@ const UserTransaction = () => {
     }
     return null;
   }, [dataProfile.linkUrl]);
+
   useEffect(() => {
+    getIdProfile();
     const convert = async () => {
       try {
-        const fileExtension = dataProfile.linkUrl?.split('.').pop() as string;
+        const fileExtension = dataProfile?.linkUrl?.split('.').pop() as string;
         const result = await getImage();
         if (result) {
           const blob =
@@ -82,62 +162,178 @@ const UserTransaction = () => {
     const getProfile = async () => {
       try {
         const fetch = await http();
-        const response = await fetch.get(`/members/${data}`);
-        setDataAbout(response.data);
+        const response = await fetch.get(`/members/${idUser}`);
+        const transaction = await fetch.get(`/transactions/member/${idUser}`);
+        setStatusMember(response.data.status);
+        setIsTransaction(!!transaction.data);
+        setDataProfile(response.data);
+        setFieldForm(prevState => ({
+          ...prevState,
+          status: response.data?.status,
+        }));
+        if (response.data.coaches) {
+          setFieldForm(prevState => ({
+            ...prevState,
+            bio: response.data?.coaches.bio,
+            isRelation: 'COACHES',
+          }));
+        }
+        if (response.data.players) {
+          setFieldForm(prevState => ({
+            ...prevState,
+            bio: response.data?.players.bio,
+
+            isRelation: 'PLAYERS',
+          }));
+        }
+        if (response.data.management) {
+          setFieldForm(prevState => ({
+            ...prevState,
+            bio: response.data?.management.bio,
+            isRelation: 'MANAGEMENTS',
+          }));
+        }
+
         convert();
       } catch (error) {
-        console.log(error.response.data);
+        console.log(error);
       }
     };
-
     getProfile();
-  }, [getImage, dataProfile.linkUrl, data]);
+    if (focusCount === 1 && isFocused) {
+      getProfile();
+    }
+    if (focusCount > 1 && isFocused) {
+      getProfile();
+    }
+  }, [getImage, dataProfile?.linkUrl, idUser, focusCount, isFocused]);
   return (
-    <ScrollView style={{padding: 30}}>
-      <Text style={styles.titleText}>Pemain Klub</Text>
-      <View style={styles.bottomBar} />
-      <Image
-        style={styles.image}
-        source={{
-          uri: preview,
-        }}
-      />
-      <View style={styles.listData}>
-        <Text style={styles.titleText}>{dataProfile.users.fullname}</Text>
+    <ScrollView
+      style={{
+        marginHorizontal: 'auto',
+      }}>
+      <View>
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="identityName"
+          defaultValue={dataProfile.identityName}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="identityNumber"
+          defaultValue={dataProfile.identityNumber}
+        />
+        {statusMember !== 'INACTIVE' && (
+          <Input
+            onChangeText={handleChange}
+            type="text"
+            name="username"
+            defaultValue={dataProfile.users?.username}
+          />
+        )}
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="email"
+          defaultValue={dataProfile.email}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="phoneNumber"
+          defaultValue={dataProfile.phoneNumber}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="birthPlace"
+          defaultValue={dataProfile.birthPlace}
+        />
+        <View style={{border: 1, height: 50, marginVertical: 8}}>
+          <Text>birthDate</Text>
+          <TouchableOpacity
+            onPress={() => setShowPicker(true)}
+            style={{
+              borderWidth: 0.5,
+              paddingHorizontal: 12,
+              height: 45,
+              borderRadius: 8,
+              paddingTop: 8,
+            }}>
+            <Text>{fieldForm.birthDate.toDateString()}</Text>
+          </TouchableOpacity>
+        </View>
+        {showPicker && (
+          <RNDateTimePicker
+            mode="date"
+            value={fieldForm.birthDate || dataProfile.birthDate}
+            onChange={handleDateChange}
+            style={{height: 20}}
+          />
+        )}
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="address"
+          defaultValue={dataProfile.address}
+        />
+        <Select
+          handleChange={handleChange}
+          title="nationality"
+          defaultValue={dataProfile.nationality}
+          value={fieldForm.nationality}
+          options={OPTIONS_NATIONALITY}
+          disabled={true}
+        />
+        <Select
+          handleChange={handleChange}
+          title="religion"
+          defaultValue={dataProfile.religion}
+          value={fieldForm.religion}
+          options={OPTIONS_RELIGION}
+          disabled={true}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="weight"
+          defaultValue={dataProfile.weight}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="height"
+          defaultValue={dataProfile.height}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="bio"
+          defaultValue={fieldForm.bio}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="backName"
+          defaultValue={fieldForm?.backName}
+        />
+        <Input
+          onChangeText={handleChange}
+          type="text"
+          name="backNumber"
+          defaultValue={fieldForm?.backNumber}
+        />
       </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Posisi</Text>
-        <Text style={styles.textList}>{dataProfile.position}</Text>
+      <View style={{marginTop: 24, marginBottom: 80}}>
+        <Button
+          action={onSubmit}
+          title="submit"
+          text="Daftar"
+          variant="primary"
+        />
       </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Nomor Punggung</Text>
-        <Text style={styles.textList}>{dataProfile.identityNumber}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Nama Pemain</Text>
-        <Text style={styles.textList}>{dataProfile.identityName}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Tempat Lahir</Text>
-        <Text style={styles.textList}>{dataProfile.birthPlace}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Tanggal Lahir</Text>
-        <Text style={styles.textList}>{dataProfile.birthDate}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Berat</Text>
-        <Text style={styles.textList}>{dataProfile.weight}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Tinggi</Text>
-        <Text style={styles.textList}>{dataProfile.height}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Kewarganegaraan</Text>
-        <Text style={styles.textList}>{dataProfile.nationality}</Text>
-      </View>
-      <Button>Daftar Anggota</Button>
     </ScrollView>
   );
 };
@@ -145,26 +341,6 @@ const UserTransaction = () => {
 export default UserTransaction;
 
 const styles = StyleSheet.create({
-  titleText: {fontSize: 24, color: TEXT_DARK, fontWeight: '600', marginTop: 8},
-  bottomBar: {
-    borderBottomWidth: 3,
-    width: '50%',
-    borderColor: PRIMARY_COLOR,
-    marginTop: 4,
-    marginBottom: 8,
-  },
-  listData: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#FEE',
-  },
-  textList: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: TEXT_DARK,
-  },
   image: {
     borderRadius: 8,
     width: windowWidth - 60,

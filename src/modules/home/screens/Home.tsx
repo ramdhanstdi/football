@@ -15,8 +15,10 @@ import http from 'helpers/axios';
 
 const Home = ({navigation}: any) => {
   const [user, setUser] = useState('');
+  const [idUser, setIdUser] = useState('');
   const [dataNews, setDataNews] = useState([{title: '', linkUrl: '', id: ''}]);
   const [detailUser, setDetail] = useState({fullname: ''});
+  const [statusMember, setStatusMember] = useState('');
 
   const handleSubmit = () => {
     navigation.navigate('Media');
@@ -33,7 +35,7 @@ const Home = ({navigation}: any) => {
         response.data.members === 'INACTIVE' &&
         response.data.type === 'INTERNAL'
       ) {
-        navigation.navigate('setpassword');
+        navigation.navigate('ChangePassword');
       }
     } catch (error) {
       //
@@ -44,6 +46,9 @@ const Home = ({navigation}: any) => {
     const getItemtoken = async (): Promise<any> => {
       try {
         const value = await AsyncStorage.getItem('username');
+        const userId = await AsyncStorage.getItem('userId');
+        setIdUser(userId);
+
         if (value !== null) {
           setUser(value);
           return value;
@@ -63,6 +68,8 @@ const Home = ({navigation}: any) => {
             status: 'published',
           },
         });
+        const status = await fetch.get(`/members/${idUser}`);
+        setStatusMember(status.data.status);
         setDataNews(response.data.items);
       } catch (error) {
         //
@@ -73,7 +80,7 @@ const Home = ({navigation}: any) => {
     if (user) {
       getDetailUsername();
     }
-  }, [getDetailUsername, user]);
+  }, [getDetailUsername, idUser, user]);
   return (
     <View>
       <View style={styles.header}>
@@ -83,9 +90,30 @@ const Home = ({navigation}: any) => {
             style={{width: 40, height: 40}}
           />
         </View>
-        <Text style={{color: TEXT_LIGHT, fontSize: 16}}>
-          Selamat Datang {detailUser?.fullname}
-        </Text>
+        <View>
+          {detailUser?.fullname ? (
+            <Text
+              style={{
+                color: TEXT_LIGHT,
+                fontSize: 16,
+              }}>{`Selamat Datang ${detailUser.fullname}`}</Text>
+          ) : (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                maxWidth: 24,
+              }}>
+              <Button
+                action={() => navigation.navigate('Login')}
+                title="submit"
+                text="Login"
+                style={{width: 100}}
+              />
+            </View>
+          )}
+        </View>
       </View>
       <ImageBackground source={require('assets/images/bg-main.jpg')}>
         <Text
@@ -124,6 +152,21 @@ const Home = ({navigation}: any) => {
           </View>
         </View>
       </ImageBackground>
+      {statusMember === 'INACTIVE' && (
+        <View
+          style={{marginTop: 24, marginBottom: 65, marginHorizontal: 'auto'}}>
+          <Text style={{fontSize: 16, fontWeight: '600', padding: 12}}>
+            Akun ini belum aktif mohon klik aktifasi transaksi untuk melanjutkan
+            halaman ini
+          </Text>
+          <Button
+            action={() => navigation.navigate('UserTransaction')}
+            title="submit"
+            text={'Daftar Transaksi'}
+            variant="primary"
+          />
+        </View>
+      )}
       <View
         style={{
           backgroundColor: '#fff',

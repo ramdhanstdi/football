@@ -34,7 +34,7 @@ const FormLogin = ({
 
         <Text
           style={styleLocal.textForgot}
-          onPress={() => navigation.navigate('ForgotPassword')}>
+          onPress={() => navigation.navigate('ResetPassword')}>
           Lupa Password?
         </Text>
       </View>

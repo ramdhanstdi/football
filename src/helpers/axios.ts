@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import {StackActions} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const getItemtoken = async (): Promise<any> => {
   try {
@@ -40,6 +42,8 @@ const http = async () => {
     async error => {
       if (error.response.data.statusCode) {
         await removeItemtoken();
+        const navigation = useNavigation();
+        navigation.dispatch(StackActions.replace('Login'));
       }
       return Promise.reject(error);
     },

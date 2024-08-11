@@ -1,12 +1,53 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {PRIMARY_COLOR, TEXT_DARK} from 'assets/const/FontColor';
 import AboutDetail from '../components/AboutDetail';
 import AboutTeam from '../components/AboutTeam';
 import AboutProfile from '../components/AboutProfile';
+import http from 'helpers/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const About = ({navigation}) => {
   const [section, setSection] = useState('about');
+  const [user, setUser] = useState('');
+  const [detailUser, setDetail] = useState({fullname: ''});
+
+  const getDetailUsername = useCallback(async () => {
+    try {
+      const fetch = await http();
+      const response = await fetch.post('/auth/find-username', {
+        username: user,
+      });
+      setDetail(response.data);
+      if (
+        response.data.members === 'INACTIVE' &&
+        response.data.type === 'INTERNAL'
+      ) {
+        navigation.navigate('setpassword');
+      }
+    } catch (error) {
+      //
+    }
+  }, [navigation, user]);
+
+  useEffect(() => {
+    const getItemtoken = async (): Promise<any> => {
+      try {
+        const value = await AsyncStorage.getItem('username');
+        if (value !== null) {
+          setUser(value);
+          return value;
+        }
+      } catch (error) {
+        return '';
+      }
+    };
+    getItemtoken();
+    if (user) {
+      getDetailUsername();
+    }
+  }, [getDetailUsername, user]);
+
   return (
     <View>
       <View
@@ -20,12 +61,16 @@ const About = ({navigation}) => {
         <TouchableOpacity onPress={() => setSection('about')}>
           <Text style={styles.textTitle}>About</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSection('tim')}>
-          <Text style={styles.textTitle}>Tim</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSection('profile')}>
-          <Text style={styles.textTitle}>Profile User</Text>
-        </TouchableOpacity>
+        {detailUser?.fullname && (
+          <TouchableOpacity onPress={() => setSection('tim')}>
+            <Text style={styles.textTitle}>Tim</Text>
+          </TouchableOpacity>
+        )}
+        {detailUser?.fullname && (
+          <TouchableOpacity onPress={() => setSection('profile')}>
+            <Text style={styles.textTitle}>Profile User</Text>
+          </TouchableOpacity>
+        )}
       </View>
       {section === 'about' && (
         <View>

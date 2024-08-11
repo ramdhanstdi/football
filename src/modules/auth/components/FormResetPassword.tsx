@@ -39,15 +39,17 @@ const FormResetPassword = ({
         <Button
           action={handleSubmit}
           title="submit"
-          text={idUser ? 'Cari' : 'Reset Password'}
+          text={idUser ? 'Reset Password' : 'Cari'}
           variant="primary"
           disabled={formInvalid}
         />
-        <Button
-          action={() => navigation.navigate('Register')}
-          title="submit"
-          text="Daftar"
-        />
+        {!idUser && (
+          <Button
+            action={() => navigation.navigate('Register')}
+            title="submit"
+            text="Daftar"
+          />
+        )}
       </View>
     </View>
   );

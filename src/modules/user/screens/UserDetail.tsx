@@ -105,46 +105,43 @@ const UserDetail = ({navigation}) => {
           uri: preview,
         }}
       />
-      <View style={styles.listData}>
-        <Text style={styles.titleText}>{dataProfile.users.fullname}</Text>
+      <View style={{display: 'flex', flexDirection: 'column', gap: 8}}>
+        <View style={styles.listData}>
+          <Text style={styles.titleText}>{dataProfile.users.fullname}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Posisi</Text>
+          <Text style={styles.textList}>{dataProfile.position}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Nomor Punggung</Text>
+          <Text style={styles.textList}>{dataProfile.identityNumber}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Nama Pemain</Text>
+          <Text style={styles.textList}>{dataProfile.identityName}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Tempat Lahir</Text>
+          <Text style={styles.textList}>{dataProfile.birthPlace}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Tanggal Lahir</Text>
+          <Text style={styles.textList}>{dataProfile.birthDate}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Berat</Text>
+          <Text style={styles.textList}>{dataProfile.weight}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Tinggi</Text>
+          <Text style={styles.textList}>{dataProfile.height}</Text>
+        </View>
+        <View style={styles.listData}>
+          <Text style={styles.textList}>Kewarganegaraan</Text>
+          <Text style={styles.textList}>{dataProfile.nationality}</Text>
+        </View>
       </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Posisi</Text>
-        <Text style={styles.textList}>{dataProfile.position}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Nomor Punggung</Text>
-        <Text style={styles.textList}>{dataProfile.identityNumber}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Nama Pemain</Text>
-        <Text style={styles.textList}>{dataProfile.identityName}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Tempat Lahir</Text>
-        <Text style={styles.textList}>{dataProfile.birthPlace}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Tanggal Lahir</Text>
-        <Text style={styles.textList}>{dataProfile.birthDate}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Berat</Text>
-        <Text style={styles.textList}>{dataProfile.weight}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Tinggi</Text>
-        <Text style={styles.textList}>{dataProfile.height}</Text>
-      </View>
-      <View style={styles.listData}>
-        <Text style={styles.textList}>Kewarganegaraan</Text>
-        <Text style={styles.textList}>{dataProfile.nationality}</Text>
-      </View>
-      {isTransaction && (
-        <Button action={() => navigation.navigate('UserTransaction')}>
-          Daftar Anggota
-        </Button>
-      )}
     </ScrollView>
   );
 };
