@@ -19,7 +19,6 @@ const ChangePassword = ({navigation}: any) => {
 
   const onSubmit = async (val: any) => {
     const objectValue = {
-      username: val.Username,
       password: val.Password,
     };
 
@@ -27,19 +26,23 @@ const ChangePassword = ({navigation}: any) => {
       const value = await AsyncStorage.getItem('userId');
       setIdUser(prevState => ({...prevState, id: value as string}));
       const fetch = await http();
-      const user = await fetch.post(`/auth/reset-password/${idUser.id}`);
-      const set = await fetch.post(
-        `/auth/set-new-password/${idUser.id}/${idUser.type}`,
+      const user = await fetch.put(
+        `/auth/reset-password/${idUser.id}`,
         objectValue,
       );
+      console.log(idUser.id);
 
-      // console.log(user, set);
+      const set = await fetch.put(
+        `/auth/set-new-password/${idUser.id}/${idUser.type}`,
+        {...objectValue},
+      );
+      console.log(user, set);
 
       setSuccess('Berhasil Ganti Password');
-      // setTimeout(() => navigation.navigate('BottomTabComponent'), 3000);
+      setTimeout(() => navigation.navigate('BottomTabComponent'), 3000);
     } catch (error) {
-      console.log(error);
-      // setError(error);
+      console.log(error.response.data.message);
+      setError(error.response.data.message);
     }
   };
 
@@ -69,7 +72,7 @@ const ChangePassword = ({navigation}: any) => {
             alignItems: 'center',
           }}>
           <Text style={{fontSize: 24, color: TEXT_LIGHT}}>
-            {error || success}
+            {typeof error === 'string' ? error : error[0] || success}
           </Text>
         </View>
       )}

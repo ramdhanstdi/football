@@ -40,7 +40,7 @@ const http = async () => {
       return response.data;
     },
     async error => {
-      if (error.response.data.statusCode) {
+      if (error.response.data.statusCode === 401) {
         await removeItemtoken();
         const navigation = useNavigation();
         navigation.dispatch(StackActions.replace('Login'));

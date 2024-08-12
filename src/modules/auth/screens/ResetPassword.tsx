@@ -28,14 +28,16 @@ const ResetPassword = ({navigation}: any) => {
           ...objectValue,
         });
         setIdUser({id: response.data.id, type: response.data.type});
-        await fetch.post(`/auth/reset-password/${response.data.id}`);
+        await fetch.put(`/auth/reset-password/${response.data.id}`, {
+          ...objectValue,
+        });
         setSuccess('User Ditemukan Silahkan Reset Password');
       } catch (error) {
         setError(error.response.data.message);
       }
     } else {
       try {
-        const response = await fetch.post(
+        const response = await fetch.put(
           `/auth/set-new-password/${idUser.id}/${idUser.type}`,
           {
             ...objectValue,
