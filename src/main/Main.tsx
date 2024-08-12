@@ -13,8 +13,7 @@ import UserDetail from 'modules/user/screens/UserDetail';
 import ResetPassword from 'modules/auth/screens/ResetPassword';
 import UserTransaction from 'modules/user/screens/UserTransaction';
 import CheckTransaction from 'modules/payment/screens/CheckTransaction';
-import {Text, View} from 'react-native';
-import ChangePassword from 'modules/about/screens/ChangePassword';
+import ChangePassword from 'modules/user/screens/ChangePassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -83,11 +82,7 @@ const Main = ({navigation}) => {
           name="ProfileInformation"
           component={ProfileInformation}
         />
-        <Stack.Screen
-          options={{headerShown: true}}
-          name="ChangePassword"
-          component={ChangePassword}
-        />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
       </Stack.Navigator>
     </NavigationContainer>
   );

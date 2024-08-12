@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
 import {
   SUCCESS_COLOR,
@@ -7,8 +7,8 @@ import {
   WARNING_COLOR,
 } from 'assets/const/FontColor';
 import http from 'helpers/axios';
-import FormResetPassword from 'modules/auth/components/FormResetPassword';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FormChangePassword from '../components/FormChangePassword';
 
 const ChangePassword = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
@@ -22,19 +22,24 @@ const ChangePassword = ({navigation}: any) => {
       username: val.Username,
       password: val.Password,
     };
-    if (idUser.id) {
-      try {
-        const fetch = await http();
-        await fetch.post(`/auth/reset-password/${idUser.id}`);
-        await fetch.post(`/auth/set-new-password/${idUser.id}/${idUser.type}`, {
-          ...objectValue,
-        });
-        setSuccess('Berhasil Ganti Password');
-        setTimeout(() => navigation.navigate('BottomTabComponent'), 3000);
-      } catch (error) {
-        console.log(error);
-        setError(error.response.data.message);
-      }
+
+    try {
+      const value = await AsyncStorage.getItem('userId');
+      setIdUser(prevState => ({...prevState, id: value as string}));
+      const fetch = await http();
+      const user = await fetch.post(`/auth/reset-password/${idUser.id}`);
+      const set = await fetch.post(
+        `/auth/set-new-password/${idUser.id}/${idUser.type}`,
+        objectValue,
+      );
+
+      // console.log(user, set);
+
+      setSuccess('Berhasil Ganti Password');
+      // setTimeout(() => navigation.navigate('BottomTabComponent'), 3000);
+    } catch (error) {
+      console.log(error);
+      // setError(error);
     }
   };
 
@@ -54,16 +59,8 @@ const ChangePassword = ({navigation}: any) => {
     }
   };
 
-  useEffect(() => {
-    const getIdProfile = async () => {
-      const value = await AsyncStorage.getItem('userId');
-      setIdUser(prevState => ({...prevState, id: value as string}));
-    };
-    getIdProfile();
-  }, []);
-
   return (
-    <>
+    <ScrollView>
       {(error || success) && (
         <View
           style={{
@@ -93,11 +90,10 @@ const ChangePassword = ({navigation}: any) => {
         <View style={styleLocal.cardChangePassword}>
           <View>
             <Text style={{fontSize: 20, fontWeight: 500, color: TEXT_DARK}}>
-              {idUser.id ? 'Reset Password' : 'Cari User'}
+              Change Password
             </Text>
           </View>
-          <FormResetPassword
-            idUser={idUser.id}
+          <FormChangePassword
             navigation={navigation}
             handleChange={handleChange}
             handleBlur={handleBlur}
@@ -106,7 +102,7 @@ const ChangePassword = ({navigation}: any) => {
           />
         </View>
       </ScrollView>
-    </>
+    </ScrollView>
   );
 };
 
