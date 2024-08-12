@@ -5,20 +5,25 @@ import {
   Text,
   StyleSheet,
   ImageBackground,
+  RefreshControl,
 } from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import CardSlideHorizontal from '../components/CardSlideHorizontal';
 import Button from 'base/components/Button';
 import {PRIMARY_COLOR, TEXT_DARK, TEXT_LIGHT} from 'assets/const/FontColor';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import http from 'helpers/axios';
+import {useFocusEffect} from '@react-navigation/native';
+import {useToken} from 'main/TokenProvider';
 
 const Home = ({navigation}: any) => {
   const [user, setUser] = useState('');
   const [idUser, setIdUser] = useState('');
   const [dataNews, setDataNews] = useState([{title: '', linkUrl: '', id: ''}]);
   const [detailUser, setDetail] = useState({fullname: ''});
+  const [refreshing, setRefresing] = useState(false);
   const [statusMember, setStatusMember] = useState('');
+  const {userName} = useToken();
 
   const handleSubmit = () => {
     navigation.navigate('Media');
@@ -28,61 +33,67 @@ const Home = ({navigation}: any) => {
     try {
       const fetch = await http();
       const response = await fetch.post('/auth/find-username', {
-        username: user,
+        username: user || userName,
       });
       setDetail(response.data);
-      if (
-        response.data.members === 'INACTIVE' &&
-        response.data.type === 'INTERNAL'
-      ) {
-        navigation.navigate('ChangePassword');
-      }
     } catch (error) {
       //
     }
-  }, [navigation, user]);
+  }, [user, userName]);
 
-  useEffect(() => {
-    const getItemtoken = async (): Promise<any> => {
-      try {
-        const value = await AsyncStorage.getItem('username');
-        const userId = await AsyncStorage.getItem('userId');
-        setIdUser(userId);
+  const onRefresh = useCallback(async () => {
+    setRefresing(true);
+    getDetailUsername();
+    setRefresing(false);
+  }, [getDetailUsername]);
 
-        if (value !== null) {
-          setUser(value);
-          return value;
+  useFocusEffect(
+    useCallback(() => {
+      const getItemtoken = async (): Promise<any> => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          const userId = await AsyncStorage.getItem('userId');
+          setIdUser(userId || userName);
+          console.log(userName, 'SDFSDFSDF');
+
+          if (value !== null) {
+            setUser(value);
+            return value;
+          }
+        } catch (error) {
+          return '';
         }
-      } catch (error) {
-        return '';
+      };
+      const getNews = async () => {
+        try {
+          const fetch = await http();
+          const response = await fetch.get('/news', {
+            params: {
+              sortBy: 'createdAt | DESC',
+              page: 1,
+              limit: 5,
+              status: 'published',
+            },
+          });
+          const status = await fetch.get(`/members/${idUser}`);
+          setStatusMember(status.data.status);
+          setDataNews(response.data.items);
+        } catch (error) {
+          //
+        }
+      };
+      getItemtoken();
+      getNews();
+      if (user) {
+        getDetailUsername();
       }
-    };
-    const getNews = async () => {
-      try {
-        const fetch = await http();
-        const response = await fetch.get('/news', {
-          params: {
-            sortBy: 'createdAt | DESC',
-            page: 1,
-            limit: 5,
-            status: 'published',
-          },
-        });
-        const status = await fetch.get(`/members/${idUser}`);
-        setStatusMember(status.data.status);
-        setDataNews(response.data.items);
-      } catch (error) {
-        //
-      }
-    };
-    getItemtoken();
-    getNews();
-    if (user) {
-      getDetailUsername();
-    }
-  }, [getDetailUsername, idUser, user]);
+    }, [getDetailUsername, idUser, user]),
+  );
   return (
-    <View>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <View style={styles.header}>
         <View>
           <Image
@@ -196,7 +207,7 @@ const Home = ({navigation}: any) => {
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

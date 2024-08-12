@@ -10,7 +10,7 @@ const Login = ({navigation}: any) => {
   const [inValid, setInvalid] = useState(true);
   const [fieldForm, setFieldForm] = useState({});
   const [error, setError] = useState('');
-  const {setToken} = useToken();
+  const {setToken, setUserName} = useToken();
 
   const setItemToken = async (
     token: string,
@@ -39,7 +39,6 @@ const Login = ({navigation}: any) => {
       const response = await fetch.post('/auth/mobile/login', {
         ...objectValue,
       });
-      console.log(response.data);
 
       setItemToken(
         response.data.token,
@@ -48,6 +47,8 @@ const Login = ({navigation}: any) => {
         response.data.user.members.status,
       );
       setToken(response.data.token);
+      setUserName(response.data.user.username);
+      navigation.navigate('BottomTabComponent');
     } catch (error) {
       setError(error.response.data.message);
     }
