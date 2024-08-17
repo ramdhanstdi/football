@@ -42,8 +42,8 @@ const http = async () => {
     async error => {
       if (error.response.data.statusCode === 401) {
         await removeItemtoken();
-        const navigation = useNavigation();
-        navigation.dispatch(StackActions.replace('Login'));
+        // const navigation = useNavigation();
+        // navigation.dispatch(StackActions.replace('Login'));
       }
       return Promise.reject(error);
     },

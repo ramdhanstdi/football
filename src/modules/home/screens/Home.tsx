@@ -54,7 +54,6 @@ const Home = ({navigation}: any) => {
           const value = await AsyncStorage.getItem('username');
           const userId = await AsyncStorage.getItem('userId');
           setIdUser(userId || userName);
-          console.log(userName, 'SDFSDFSDF');
 
           if (value !== null) {
             setUser(value);
