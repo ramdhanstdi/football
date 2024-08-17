@@ -27,13 +27,23 @@ const ResetPassword = ({navigation}: any) => {
         const response = await fetch.post('/auth/find-username', {
           ...objectValue,
         });
-        setIdUser({id: response.data.id, type: response.data.type});
-        await fetch.put(`/auth/reset-password/${response.data.id}`, {
-          ...objectValue,
-        });
+        let type =''
+        if (response.data.members.coaches) {
+          type='COACHES'
+        }
+        if (response.data.members.players) {
+          type='PLAYERS'
+        }
+        if (response.data.members.management) {
+          type='MANAGEMENTS'
+        }
+        setIdUser({id: response.data.id, type: type});
+        // await fetch.put(/auth/reset-password/${response.data.id}, {
+        //   ...objectValue,
+        // });
         setSuccess('User Ditemukan Silahkan Reset Password');
-      } catch (error) {
-        setError(error.response.data.message);
+      } catch (error:any) {
+        setError(error?.response?.data?.message);
       }
     } else {
       try {

@@ -24,7 +24,9 @@ const Home = ({navigation}: any) => {
   const [refreshing, setRefresing] = useState(false);
   const [statusMember, setStatusMember] = useState('');
   const {userName} = useToken();
-
+  const handleRegistration = () => {
+    navigation.navigate('Registration_sbb');
+  };
   const handleSubmit = () => {
     navigation.navigate('Media');
   };
@@ -54,6 +56,7 @@ const Home = ({navigation}: any) => {
           const value = await AsyncStorage.getItem('username');
           const userId = await AsyncStorage.getItem('userId');
           setIdUser(userId || userName);
+          console.log(userName, 'SDFSDFSDF');
 
           if (value !== null) {
             setUser(value);
@@ -206,6 +209,15 @@ const Home = ({navigation}: any) => {
           />
         </View>
       </View>
+      <View style={{ marginBottom: 50, alignItems: 'center' }}>
+          <Button
+            action={handleRegistration}
+            title="Registration SBB"
+            text="Registration SBB"
+            variant="primary"
+            disabled={false}
+          />
+        </View>
     </ScrollView>
   );
 };

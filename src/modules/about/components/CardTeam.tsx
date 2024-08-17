@@ -32,10 +32,13 @@ const CardTeam = ({
       const timeoutId = setTimeout(() => controller.abort(), 1000000);
       const fetch = await http();
       try {
-        const result = await fetch.get(`/files/${imgSrc.replace('/', '%2f')}`, {
-          signal: controller.signal,
-          responseType: 'blob',
-        });
+        const result = await fetch.get(
+          `/files/private/${imgSrc.replace('/', '%2f')}`,
+          {
+            signal: controller.signal,
+            responseType: 'blob',
+          },
+        );
         return Promise.resolve(result);
       } catch (err) {
         const error = err as any;
